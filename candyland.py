@@ -1,9 +1,9 @@
 import itertools
 from random import shuffle
 import time
+import copy
 
 player_count = 4
-player_pos = [0] * player_count
 color_map = {
 	"r":"red",
 	"p":"purple",
@@ -42,7 +42,7 @@ def init_deck():
 	shuffle(deck)
 	return deck
 
-def player_turn(player_id, deck):
+def player_turn(player_id, deck, player_pos):
 	pos = player_pos[player_id]
 	card = deck.pop()
 	if(pos in sticky_spaces):
@@ -75,20 +75,26 @@ def get_next_color(pos, color):
 
 def run_game(player_count):
 	deck = init_deck()
+	player_pos = [0] * player_count
 	current_player = player_count-1
 	turn_list = []
 	while 135 not in player_pos:
 		current_player=(current_player+1)%(player_count)
-		card = deck[len(deck)-1]
-		player_turn(current_player, deck)
-		turn_list.append((current_player, card, player_pos))
+		card = deck[-1]
+		player_turn(current_player, deck, player_pos)
+		turn_list.append((current_player, card, copy.deepcopy(player_pos)))
 		if len(deck)==0:
 			deck = init_deck()
 	return turn_list
 
-turnset = run_game(player_count)
-for turn in turnset:
-	print(str(turn[0]) + " draws " + str(turn[1]))
-	print(turn[2])
-print("Game over. Winner: "+str(turnset[-1][2].index(135)))
-print("Total turns: "+str(len(turnset)))
+def main():
+	turnset = run_game(player_count)
+	for turn in turnset:
+		print(str(turn[0]) + " draws " + str(turn[1]))
+		print(turn[2])
+	winner = turnset[-1][2].index(135)
+	print("Game over. Winner: "+str(winner))
+	print("Total turns: "+str(((len(turnset)-(1+winner))/player_count)+1))
+
+if __name__ == "__main__":
+	main()
