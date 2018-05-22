@@ -73,18 +73,22 @@ def get_next_color(pos, color):
 		pos = board[pos+1:].index(color)+pos+1
 	return pos
 
-deck = init_deck()
-current_player = player_count-1
-turns = 0
-while 135 not in player_pos:
-	current_player=(current_player+1)%(player_count)
-	print(str(current_player) + " draws " + deck[len(deck)-1])
-	player_turn(current_player, deck)
-	print(player_pos)
-	if len(deck)==0:
-		deck = init_deck()
-	if current_player==0:
-		turns=turns+1
-		# time.sleep(3)
-print("Game over. Winner: "+str(current_player))
-print("Total turns: "+str(turns))
+def run_game(player_count):
+	deck = init_deck()
+	current_player = player_count-1
+	turn_list = []
+	while 135 not in player_pos:
+		current_player=(current_player+1)%(player_count)
+		card = deck[len(deck)-1]
+		player_turn(current_player, deck)
+		turn_list.append((current_player, card, player_pos))
+		if len(deck)==0:
+			deck = init_deck()
+	return turn_list
+
+turnset = run_game(player_count)
+for turn in turnset:
+	print(str(turn[0]) + " draws " + str(turn[1]))
+	print(turn[2])
+print("Game over. Winner: "+str(turnset[-1][2].index(135)))
+print("Total turns: "+str(len(turnset)))
